@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PV</title>
+  <style>
+    @media print {
+      button {
+        display: none;
+      }
+       #chartContainer {
+    display: block !important;
+    width: 50%; /* Ensure it adapts to the page width */
+    height: auto; /* Maintain aspect ratio */
+    text-align: center;
+  }
+
+  #passFailChart {
+    width: 50%; /* Scale down the chart */
+    height: auto; /* Maintain aspect ratio */ /* Ensure it doesn’t exceed typical A4 print width */
+  }
+    }
+
+    /* Table Styling */
+    table {
+      width: 80%;
+      border-collapse: collapse;
+      margin: 20px auto;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    thead {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tbody tr:nth-child(odd) {
+      background-color: #ffffff;
+    }
+    tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    #chartContainer {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      page-break-inside: avoid; /* Prevents the chart from splitting across pages */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Display Filiere -->
+  <label>Filiere: ISIL</label>
+
+  <!-- Table of Student Grades -->
+  <table>
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Student Name</th>
+        <th>Average Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in student_grades %}
+      <tr>
+        <td>{{ record.student.id }}</td>
+        <td>{{ record.student.nom_pre }}</td>
+        <td>{{ record.average_grade|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Buttons -->
+  <button onclick="handlePrint()">Print</button>
+
+  <!-- Pie Chart Container -->
+  <div id="chartContainer">
+    <canvas id="passFailChart"></canvas>
+  </div>
+
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    let passFailChart; // Global variable to hold the chart instance
+
+    function renderChart() {
+      const ctx = document.getElementById('passFailChart').getContext('2d');
+      const passCount = {{ passinggrades|default:0 }};
+      const failCount = {{ failinggrades|default:0 }};
+
+      if (passFailChart) passFailChart.destroy();
+
+      // Create a new chart
+      passFailChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Passed', 'Failed'],
+          datasets: [{
+            data: [passCount, failCount],
+            backgroundColor: ['#4CAF50', '#FF6347']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+
+    function handlePrint() {
+      // Show chart container and render the chart
+      const chartContainer = document.getElementById('chartContainer');
+      chartContainer.style.display = 'block';
+      renderChart();
+
+      // Delay printing to ensure chart has time to render
+      setTimeout(() => {
+        window.print();
+        chartContainer.style.display = 'none'; // Hide after printing
+      }, 1000); // Adjust delay as needed
+    }
+  </script>
+</body>
+</html>

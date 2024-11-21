@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charts with Chart.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{#    <style>#}
+{#        /* Container to hold both charts side by side */#}
+{#        .chart-container {#}
+{#            display: flex; /* Enables flexbox */#}
+{#            justify-content: space-around; /* Distributes space between the charts */#}
+{#            align-items: center; /* Aligns items vertically */#}
+{#             /* Adds space between the charts */#}
+{#        }#}
+{##}
+{#        /* Optional styling for the canvas to make it responsive */#}
+{#        canvas {#}
+{#            width: 50% !important;  /* Adjust width of the canvas elements */#}
+{#            height: auto !important; /* Maintain aspect ratio */#}
+{#        }#}
+{#    </style>#}
+</head>
+<body>
+
+<div class="chart-container">
+    <div>
+        <h2>Bar Chart</h2>
+        <canvas id="histogramChart" ></canvas>
+    </div>
+    <div>
+        <h2>Pie Chart</h2>
+        <canvas id="pieChart"></canvas>
+    </div>
+    <div>
+        <h2>Bar Chart2</h2>
+        <canvas id="histogramChart2" ></canvas>
+    </div>
+    <div>
+        <h2>Pie Chart2</h2>
+        <canvas id="pieChart2"></canvas>
+    </div>
+</div>
+
+<script>
+    // Bar Chart
+    const ctxBar = document.getElementById("histogramChart").getContext("2d");
+
+    const dataBar = {
+        labels: ["Male", "Female"],
+        datasets: [{
+            label: "Gender Distribution",
+            data: [{{ male }}, {{ female }}],
+            backgroundColor: ["blue", "pink"]
+        }]
+    };
+
+    new Chart(ctxBar, {
+        type: "bar",
+        data: dataBar,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                    }
+                }
+            }
+        }
+    });
+
+    // Pie Chart
+    const ctxPie = document.getElementById("pieChart").getContext("2d");
+
+    const dataPie = {
+        labels: ["Male", "Female"],
+        datasets: [{
+            label: "Gender (%)",
+            data: [({{ male }}/{{ all }})*100, ({{ female }}/ {{all}})*100],
+            backgroundColor: ["blue", "pink"]
+        }]
+    };
+
+    new Chart(ctxPie, {
+        type: "pie",
+        data: dataPie,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+    const ctxBar2 = document.getElementById("histogramChart2").getContext("2d");
+
+    const dataBar2 = {
+        labels: ["user", "admin"],
+        datasets: [{
+            label: "users",
+            data: [{{ user }}, {{ admin }}],
+            backgroundColor: ["blue", "pink"]
+        }]
+    };
+
+    new Chart(ctxBar2, {
+        type: "bar",
+        data: dataBar2,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                    }
+                }
+            }
+        }
+    });
+
+    // Pie Chart
+    const ctxPie2 = document.getElementById("pieChart2").getContext("2d");
+
+    const dataPie2 = {
+        labels: ["user", "admin"],
+        datasets: [{
+            label: "users (%)",
+            data: [({{ user }}/{{ all2 }})*100, ({{ admin }}/ {{all2}})*100],
+            backgroundColor: ["blue", "pink"]
+        }]
+    };
+
+    new Chart(ctxPie2, {
+        type: "pie",
+        data: dataPie2,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

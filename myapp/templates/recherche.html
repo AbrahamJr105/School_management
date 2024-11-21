@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Recherche Étudiant</title>
+</head>
+<body>
+    <h2>Rechercher un étudiant</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="num">Numéro Étudiant :</label>
+        <input type="number" name="num" id="num" required>
+        <button type="submit" name="bulletin">Voir le Bulletin</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bulletin de Notes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Bulletin de Notes</h2>
+
+    <div>
+        <label>Civilité :</label>
+        <input type="text" value="{{ etudiant.civilite }}" readonly>
+    </div>
+
+    <div>
+        <label>Nom/Prénom :</label>
+        <input type="text" value="{{ etudiant.nom_pre }}" readonly>
+    </div>
+
+    <div>
+        <label>Filière :</label>
+        <input type="text" value="{{ etudiant.filiere }}" readonly>
+    </div>
+
+    <table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Filiere</th>
+            <th>Code Module</th>
+            <th>Module</th>
+            <th>Coefficient</th>
+            <th>Note</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for note in notes %}
+        <tr>
+            <td>{{ etudiant.id }}</td>
+            <td>{{ etudiant.filiere }}</td>
+            <td>{{ note.Module.id }}</td>
+            <td>{{ note.Module }}</td>
+            <td>{{ note.Module.coefficient }}</td>
+            <td>{{ note.note }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    <p>{{ statistiques }}</p>
+    <h2>Rechercher un étudiant</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="num">Numéro Étudiant :</label>
+        <input type="number" name="num" id="num" required>
+        <button type="submit" name="bulletin">Voir le Bulletin</button>
+    </form>
+<a href="#" onclick="redirectToRoot()">Log out</a>
+
+<script>
+function redirectToRoot() {
+  window.location.href = "/";
+}
+</script>
+</body>
+</html>

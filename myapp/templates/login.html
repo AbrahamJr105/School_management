@@ -1,0 +1,13 @@
+<h2>Login</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="login">Login</button>
+    <a href="#" onclick="redirectToRoot()">Register</a>
+
+<script>
+function redirectToRoot() {
+  window.location.href = "/register";
+}
+</script>
+</form>
