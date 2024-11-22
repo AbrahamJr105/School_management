@@ -1,9 +1,12 @@
+import os
+
+from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import redirect
-
+from dotenv import load_dotenv
 from .forms import EtudiantForm, RechercheEtudiantForm, loginform
 from .models import User
-
+load_dotenv()
 
 def login(request):
     if request.method == 'POST':
@@ -131,19 +134,29 @@ from .models import Etudiant, Note, Module
 from django.db.models import Sum
 
 def bulletin_view(request):
-    if request.method == 'POST' and 'bulletin' in request.POST:
-        idetu = request.POST.get('num')
-        etudiant = get_object_or_404(Etudiant, id=idetu)
-        notes = Note.objects.filter(Etudiant_id=idetu)
-        statistiques = notes.aggregate(
-            SommeCoefficient=Sum(F('Module__coefficient')),
-            SommeCoiNotes=Sum(F('Module__coefficient') * F('note')),
-            moyenne=Sum(F('Module__coefficient') * F('note')) / Sum('Module__coefficient')
-        )
-        return render(request, 'bulletin.html', {
-            'etudiant': etudiant,
-            'notes': notes,
-            'statistiques': statistiques,
-        })
+    if request.method == 'POST' :
+        if 'bulletin' in request.POST:
+            idetu = request.POST.get('num')
+            etudiant = get_object_or_404(Etudiant, id=idetu)
+            notes = Note.objects.filter(Etudiant_id=idetu)
+            statistiques = notes.aggregate(
+                SommeCoefficient=Sum(F('Module__coefficient')),
+                SommeCoiNotes=Sum(F('Module__coefficient') * F('note')),
+                moyenne=Sum(F('Module__coefficient') * F('note')) / Sum('Module__coefficient')
+            )
+            return render(request, 'bulletin.html', {
+                'etudiant': etudiant,
+                'notes': notes,
+                'statistiques': statistiques,
+            })
+        else:
+            send_mail(
+                'Subject: Message from Your Website',
+                'This is a message from Django',
+                os.getenv('EHU'),
+                [os.getenv('EHU')],
+                fail_silently=False,
+            )
+            return HttpResponse('Email sent.')
     else:
         return render(request, 'bulletin.html')

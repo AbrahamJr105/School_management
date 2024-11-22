@@ -27,17 +27,23 @@
 
     <div>
         <label>Civilité :</label>
-        <input type="text" value="{{ etudiant.civilite }}" readonly>
+        <label>
+            <input type="text" value="{{ etudiant.civilite }}" readonly>
+        </label>
     </div>
 
     <div>
         <label>Nom/Prénom :</label>
-        <input type="text" value="{{ etudiant.nom_pre }}" readonly>
+        <label>
+            <input type="text" value="{{ etudiant.nom_pre }}" readonly>
+        </label>
     </div>
 
     <div>
         <label>Filière :</label>
-        <input type="text" value="{{ etudiant.filiere }}" readonly>
+        <label>
+            <input type="text" value="{{ etudiant.filiere }}" readonly>
+        </label>
     </div>
 
     <table>
@@ -72,12 +78,17 @@
         <input type="number" name="num" id="num" required>
         <button type="submit" name="bulletin">Voir le Bulletin</button>
     </form>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Send Email</button>
+    </form>
 <a href="#" onclick="redirectToRoot()">Log out</a>
 
 <script>
 function redirectToRoot() {
   window.location.href = "/";
 }
+
 </script>
 </body>
 </html>

@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 # settings.py
  # Redirect after logout
@@ -143,7 +145,6 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'zarebtoufik105@gmail.com'
-EMAIL_HOST_PASSWORD = 'QannswY-jN7sBdO'
+EMAIL_HOST_PASSWORD =os.getenv('EHP')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-ALLOWED_HOSTS = ['*']
