@@ -1,42 +1,46 @@
 import os
-
+from django.contrib import auth
+from django.contrib.auth import authenticate,login
+from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from dotenv import load_dotenv
 from .forms import EtudiantForm, RechercheEtudiantForm, loginform
-from .models import User
+from django.contrib.auth.decorators import login_not_required
+from django.contrib.admin.views.decorators import staff_member_required
 load_dotenv()
-
+def logout(request):
+    auth.logout(request)
+    return redirect('login')
+@login_not_required
 def login(request):
     if request.method == 'POST':
-            user = User.objects.get(email=request.POST['email'])
-            if request.POST['password']==user.password:
-                if user.role == 'admin':
-                    return redirect("/")
-                else:
-                    return redirect("/bulletin")
+            user = authenticate(username=request.POST['email'],password=request.POST['password'])
+            if user is not None:
+                auth.login(request, user)
+                return redirect('menu')
             else:
-                return HttpResponse("Wrong password")
+                return HttpResponse("Wrong credentials")
     else:
         form = loginform()
     return render(request, 'login.html', {'form': form})
-
+@login_not_required
 def register(request):
     if request.method == 'POST':
         form = loginform(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.role = request.POST.get('role')
+            user=User.objects.create_user(request.POST['email'],None, request.POST['password'])
+            user.is_staff = False if request.POST['role'] == 'user' else True
             user.save()
             return redirect('login')
     else:
         form = loginform()
     return render(request, 'register.html', {'form': form})
-
+@staff_member_required
 def menu(request):
     return render(request, 'menu.html')
-
+@staff_member_required
 def etudiant_form(request):
     if request.method == 'POST':
         if 'Enregistrer' in request.POST:
@@ -89,7 +93,7 @@ def etudiant_form(request):
 
 from django.db.models import F
 
-
+@staff_member_required
 def pv(request):
     etudiants = Etudiant.objects.all()
     student_grades = []
@@ -116,14 +120,12 @@ def pv(request):
             failinggrades+=1
 
     return render(request, 'pv.html', {'student_grades': student_grades, 'passinggrades': passinggrades, 'failinggrades': failinggrades})
+@staff_member_required
 def statistique(request):
     all=Etudiant.objects.all().count()
     male = Etudiant.objects.filter(civilite="Monsieur").count()
     female = all-male
-    all2 = User.objects.all().count()
-    user = User.objects.filter(role="user").count()
-    admin = all2 - user
-    return render(request, 'statistique.html', {'male': male, 'female': female, 'all': all, 'user': user, 'admin': admin, "all2": all2})
+    return render(request, 'statistique.html', {'male': male, 'female': female, 'all': all})
 
 
 

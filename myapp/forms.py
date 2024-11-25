@@ -1,7 +1,7 @@
 # myapp/forms.py
 from django import forms
-
-from .models import Etudiant, Sport,User
+from django.contrib.auth.models import User
+from .models import Etudiant, Sport
 
 class loginform(forms.ModelForm):
     class Meta:
