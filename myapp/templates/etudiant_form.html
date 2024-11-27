@@ -5,6 +5,7 @@
 </head>
 <body>
 <p>
+    <h1>User email: {{ request.session.user_email }}</h1>
     <h1>Etudiant Form</h1>
 
     <form method="POST">
@@ -12,26 +13,8 @@
         {{ form.as_p }}
         <button type="submit" name="Enregistrer">Enregistrer</button>
     </form>
-
-    <form method="POST">
-        {% csrf_token %}
-        {{ search_form.as_p }}
-        <button type="submit" name="rechercher">Rechercher</button>
-        <button type="submit" name="supprimer">Supprimer</button>
-        <button type="submit" name="modifier">Modifier</button>
-    </form>
-
     {% if error_message %}
         <p>{{ error_message }}</p>
-    {% endif %}
-
-    {% if etudiant %}
-        <h2>Liste des Etudiants</h2>
-        <ul>
-        {% for c,i in etudiant.items %}
-            <li>{{ c}}: {{i }}</li>
-        {% endfor %}
-        </ul>
     {% endif %}
 </body>
 </html>

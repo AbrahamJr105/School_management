@@ -1,14 +1,13 @@
-import os
 from django.contrib import auth
-from django.contrib.auth import authenticate,login
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.http import HttpResponse
 from django.shortcuts import redirect
 from dotenv import load_dotenv
+
 from .forms import EtudiantForm, RechercheEtudiantForm, loginform
-from django.contrib.auth.decorators import login_not_required
-from django.contrib.admin.views.decorators import staff_member_required
+
 load_dotenv()
 def logout(request):
     auth.logout(request)
@@ -19,6 +18,7 @@ def login(request):
             user = authenticate(username=request.POST['email'],password=request.POST['password'])
             if user is not None:
                 auth.login(request, user)
+                request.session['user_email'] = user.get_username()
                 return redirect('menu')
             else:
                 return HttpResponse("Wrong credentials")
@@ -91,7 +91,6 @@ def etudiant_form(request):
         search_form=RechercheEtudiantForm()
         return render(request, 'etudiant_form.html',{"search_form":search_form,'form': form})
 
-from django.db.models import F
 
 @staff_member_required
 def pv(request):
@@ -128,15 +127,17 @@ def statistique(request):
     return render(request, 'statistique.html', {'male': male, 'female': female, 'all': all})
 
 
-
-
-
-from django.shortcuts import render, get_object_or_404
 from .models import Etudiant, Note, Module
-from django.db.models import Sum
+
+from django.template.loader import render_to_string
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from django.core.mail import EmailMessage
+from django.db.models import Sum, F
+import os
 
 def bulletin_view(request):
-    if request.method == 'POST' :
+    if request.method == 'POST':
         if 'bulletin' in request.POST:
             idetu = request.POST.get('num')
             etudiant = get_object_or_404(Etudiant, id=idetu)
@@ -146,19 +147,24 @@ def bulletin_view(request):
                 SommeCoiNotes=Sum(F('Module__coefficient') * F('note')),
                 moyenne=Sum(F('Module__coefficient') * F('note')) / Sum('Module__coefficient')
             )
-            return render(request, 'bulletin.html', {
-                'etudiant': etudiant,
-                'notes': notes,
-                'statistiques': statistiques,
-            })
-        else:
-            send_mail(
+            html_content=render_to_string('html_content.html', {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques})
+            request.session['html_content'] = html_content
+            # Render the HTML content once and store it in the session
+          # Store rendered HTML in session
+            return render(request,'bulletin.html', {'etudiant': etudiant,'notes': notes,'statistiques': statistiques,})   # Render the bulletin in the browser
+
+        elif 'email' in request.POST:
+            html_content = request.session['html_content']
+            # Retrieve the HTML content from the session
+            email = EmailMessage(
                 'Subject: Message from Your Website',
-                'This is a message from Django',
+                html_content,
                 os.getenv('EHU'),
                 [os.getenv('EHU')],
-                fail_silently=False,
             )
+            email.content_subtype = "html"  # Indicate that the email content is HTML
+            email.send()
+
             return HttpResponse('Email sent.')
     else:
         return render(request, 'bulletin.html')

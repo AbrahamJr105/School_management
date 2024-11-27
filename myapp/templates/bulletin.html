@@ -23,26 +23,27 @@
 </head>
 
 <body>
+    <h1>User email: {{ request.session.user_email }}</h1>
     <h2>Bulletin de Notes</h2>
-
+    {% if etudiant %}
     <div>
         <label>Civilité :</label>
         <label>
-            <input type="text" value="{{ etudiant.civilite }}" readonly>
+            <p>{{ etudiant.civilite }}</p>
         </label>
     </div>
 
     <div>
         <label>Nom/Prénom :</label>
         <label>
-            <input type="text" value="{{ etudiant.nom_pre }}" readonly>
+            <p>{{ etudiant.nom_pre }}</p>
         </label>
     </div>
 
     <div>
         <label>Filière :</label>
         <label>
-            <input type="text" value="{{ etudiant.filiere }}" readonly>
+            <p> {{ etudiant.filiere }} </p>
         </label>
     </div>
 
@@ -71,6 +72,11 @@
     </tbody>
     </table>
     <p>{{ statistiques }}</p>
+        <form method="POST">
+        {% csrf_token %}
+        <button type="submit" name="email">Send Email</button>
+    </form>
+    {% endif %}
     <h2>Rechercher un étudiant</h2>
     <form method="POST">
         {% csrf_token %}
@@ -78,10 +84,7 @@
         <input type="number" name="num" id="num" required>
         <button type="submit" name="bulletin">Voir le Bulletin</button>
     </form>
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit">Send Email</button>
-    </form>
+
 <a href="logout">Log out</a>
 </body>
 </html>
