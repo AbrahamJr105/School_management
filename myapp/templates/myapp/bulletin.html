@@ -27,24 +27,19 @@
     <h2>Bulletin de Notes</h2>
     {% if etudiant %}
     <div>
-        <label>Civilité :</label>
-        <label>
-            <p>{{ etudiant.civilite }}</p>
-        </label>
+            <p>Civilité: {{ etudiant.civilite }}</p>
     </div>
 
     <div>
-        <label>Nom/Prénom :</label>
-        <label>
-            <p>{{ etudiant.nom_pre }}</p>
-        </label>
+
+            <p>Nom/Prénom:{{ etudiant.nom_pre }}</p>
+
     </div>
 
     <div>
-        <label>Filière :</label>
-        <label>
-            <p> {{ etudiant.filiere }} </p>
-        </label>
+
+            <p>Filière: {{ etudiant.filiere }} </p>
+
     </div>
 
     <table>
@@ -72,6 +67,7 @@
     </tbody>
     </table>
     <p>{{ statistiques }}</p>
+        <button onclick=print()>Print</button>
         <form method="POST">
         {% csrf_token %}
         <button type="submit" name="email">Send Email</button>
@@ -84,7 +80,6 @@
         <input type="number" name="num" id="num" required>
         <button type="submit" name="bulletin">Voir le Bulletin</button>
     </form>
-
 <a href="logout">Log out</a>
 </body>
 </html>

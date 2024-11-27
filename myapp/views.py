@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from dotenv import load_dotenv
 
-from .forms import EtudiantForm, RechercheEtudiantForm, loginform
+from .forms import EtudiantForm, RechercheForm, loginform, EnseignantForm
 
 load_dotenv()
 def logout(request):
@@ -24,7 +24,7 @@ def login(request):
                 return HttpResponse("Wrong credentials")
     else:
         form = loginform()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'accounts/login.html', {'form': form})
 @login_not_required
 def register(request):
     if request.method == 'POST':
@@ -36,10 +36,10 @@ def register(request):
             return redirect('login')
     else:
         form = loginform()
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'accounts/register.html', {'form': form})
 @staff_member_required
 def menu(request):
-    return render(request, 'menu.html')
+    return render(request, 'myapp/menu.html')
 @staff_member_required
 def etudiant_form(request):
     if request.method == 'POST':
@@ -49,20 +49,20 @@ def etudiant_form(request):
                 form.save()
                 return HttpResponse('Saved.')
             else:
-                return render(request, 'etudiant_form.html', {'form': form})
+                return render(request, 'myapp/etudiant_form.html', {'form': form})
         elif 'rechercher' in request.POST:
-            search_form = RechercheEtudiantForm(request.POST)
+            search_form = RechercheForm(request.POST)
             if search_form.is_valid():
                 search_id = search_form.cleaned_data['numero']
                 try:
                     etudiant = Etudiant.objects.get(pk=search_id)
-                    return render(request, 'etudiant_form.html', {'etudiant': etudiant})
+                    return render(request, 'myapp/etudiant_form.html', {'etudiant': etudiant})
                 except Etudiant.DoesNotExist:
                     return HttpResponse("mf was not found")
             else:
                 print(search_form.errors)
         elif 'supprimer' in request.POST:
-            search_form = RechercheEtudiantForm(request.POST)
+            search_form = RechercheForm(request.POST)
             if search_form.is_valid():
                 search_id = search_form.cleaned_data['numero']
                 try:
@@ -71,7 +71,7 @@ def etudiant_form(request):
                     return redirect('etudiant_form')
                 except Etudiant.DoesNotExist:
                     error_message = "Etudiant introuvable."
-                    return render(request, 'etudiant_form.html', {'error_message': error_message})
+                    return render(request, 'myapp/etudiant_form.html', {'error_message': error_message})
         elif 'modifier' in request.POST:
             search_id = request.POST.get('Numero')
             try:
@@ -85,13 +85,61 @@ def etudiant_form(request):
                         print(form.errors)
             except Etudiant.DoesNotExist:
                 error_message = "Etudiant introuvable."
-                return render(request, 'etudiant_form.html', {'error_message': error_message})
+                return render(request, 'myapp/etudiant_form.html', {'error_message': error_message})
     else:
         form=EtudiantForm()
-        search_form=RechercheEtudiantForm()
-        return render(request, 'etudiant_form.html',{"search_form":search_form,'form': form})
+        search_form=RechercheForm()
+        return render(request, 'myapp/etudiant_form.html', {"search_form":search_form, 'form': form})
 
-
+def enseignant_form(request):
+    if request.method == 'POST':
+        if 'Enregistrer' in request.POST:
+            form = EnseignantForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponse('Saved.')
+            else:
+                return render(request, 'myapp/enseignant_form.html', {'form': form})
+        elif 'rechercher' in request.POST:
+            search_form = RechercheForm(request.POST)
+            if search_form.is_valid():
+                search_id = search_form.cleaned_data['Numero']
+                try:
+                    enseignant = Enseignant.objects.get(pk=search_id)
+                    return render(request, 'myapp/enseignant_form.html', {'enseignant': enseignant})
+                except Enseignant.DoesNotExist:
+                    return HttpResponse("Enseignant not found")
+            else:
+                print(search_form.errors)
+        elif 'supprimer' in request.POST:
+            search_form = RechercheForm(request.POST)
+            if search_form.is_valid():
+                search_id = search_form.cleaned_data['Numero']
+                try:
+                    enseignant = Enseignant.objects.get(pk=search_id)
+                    enseignant.delete()
+                    return redirect('enseignant_form')
+                except Enseignant.DoesNotExist:
+                    error_message = "Enseignant not found."
+                    return render(request, 'myapp/enseignant_form.html', {'error_message': error_message})
+        elif 'modifier' in request.POST:
+            search_id = request.POST.get('Numero')
+            try:
+                enseignant = Enseignant.objects.get(pk=search_id)
+                if search_id and request.POST:
+                    form = EnseignantForm(request.POST, instance=enseignant)
+                    if form.is_valid():
+                        form.save()
+                        return redirect('enseignant_form')
+                    else:
+                        print(form.errors)
+            except Enseignant.DoesNotExist:
+                error_message = "Enseignant not found."
+                return render(request, 'myapp/enseignant_form.html', {'error_message': error_message})
+    else:
+        form=EnseignantForm()
+        search_form=RechercheForm()
+        return render(request, 'myapp/enseignant_form.html', {"search_form":search_form, 'form': form})
 @staff_member_required
 def pv(request):
     etudiants = Etudiant.objects.all()
@@ -118,16 +166,16 @@ def pv(request):
         else:
             failinggrades+=1
 
-    return render(request, 'pv.html', {'student_grades': student_grades, 'passinggrades': passinggrades, 'failinggrades': failinggrades})
+    return render(request, 'myapp/pv.html', {'student_grades': student_grades, 'passinggrades': passinggrades, 'failinggrades': failinggrades})
 @staff_member_required
 def statistique(request):
     all=Etudiant.objects.all().count()
     male = Etudiant.objects.filter(civilite="Monsieur").count()
     female = all-male
-    return render(request, 'statistique.html', {'male': male, 'female': female, 'all': all})
+    return render(request, 'myapp/statistique.html', {'male': male, 'female': female, 'all': all})
 
 
-from .models import Etudiant, Note, Module
+from .models import Etudiant, Note, Module, Enseignant
 
 from django.template.loader import render_to_string
 from django.shortcuts import render, get_object_or_404
@@ -147,18 +195,18 @@ def bulletin_view(request):
                 SommeCoiNotes=Sum(F('Module__coefficient') * F('note')),
                 moyenne=Sum(F('Module__coefficient') * F('note')) / Sum('Module__coefficient')
             )
-            html_content=render_to_string('html_content.html', {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques})
+            html_content=render_to_string('myapp/html_content.html', {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques})
             request.session['html_content'] = html_content
             # Render the HTML content once and store it in the session
           # Store rendered HTML in session
-            return render(request,'bulletin.html', {'etudiant': etudiant,'notes': notes,'statistiques': statistiques,})   # Render the bulletin in the browser
+            return render(request, 'myapp/bulletin.html', {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques, })   # Render the bulletin in the browser
 
         elif 'email' in request.POST:
             html_content = request.session['html_content']
             # Retrieve the HTML content from the session
             email = EmailMessage(
                 'Subject: Message from Your Website',
-                html_content,
+                'This is a message from your website: ',
                 os.getenv('EHU'),
                 [os.getenv('EHU')],
             )
@@ -167,4 +215,4 @@ def bulletin_view(request):
 
             return HttpResponse('Email sent.')
     else:
-        return render(request, 'bulletin.html')
+        return render(request, 'myapp/bulletin.html')

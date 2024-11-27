@@ -1,6 +1,17 @@
 
 # myapp/models.py
 from django.db import models
+class Enseignant(models.Model):
+    Numero = models.IntegerField()
+    Civilite = models.CharField(max_length=20)
+    Nom = models.CharField(max_length=255)
+    Prenom = models.CharField(max_length=255)
+    Adresse = models.TextField()
+    Date_naissance = models.DateField()
+    Lieu_naissance = models.CharField(max_length=255)
+    Pays = models.CharField(max_length=255)
+    Grade = models.CharField(max_length=255)
+    Specialite = models.CharField(max_length=255)
 
 class Etudiant(models.Model):
     CIVILITY_CHOICES = (
@@ -21,6 +32,7 @@ class Etudiant(models.Model):
     nationalite = models.ForeignKey('Nationalite', on_delete=models.SET_NULL, null=True)
     sports = models.ManyToManyField('Sport', blank=True)
     filiere = models.ForeignKey('Filiere', on_delete=models.SET_NULL, null=True)
+    image=models.ImageField(upload_to='images/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.civilite} {self.nom_pre}, ID: {self.id}"

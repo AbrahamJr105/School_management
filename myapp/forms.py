@@ -1,14 +1,17 @@
 # myapp/forms.py
 from django import forms
 from django.contrib.auth.models import User
-from .models import Etudiant, Sport
+from .models import Etudiant, Sport, Enseignant
 
 class loginform(forms.ModelForm):
     class Meta:
         model=User
         fields = ('email','password')
 
-
+class EnseignantForm(forms.ModelForm):
+    class Meta:
+        model=Enseignant
+        fields='__all__'
 
 class EtudiantForm(forms.ModelForm):
     class Meta:
@@ -33,5 +36,5 @@ class EtudiantForm(forms.ModelForm):
         queryset=Sport.objects.all(),
         widget=forms.CheckboxSelectMultiple)
 
-class RechercheEtudiantForm(forms.Form):
+class RechercheForm(forms.Form):
     numero = forms.IntegerField(label="Numero")
