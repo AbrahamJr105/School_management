@@ -165,6 +165,21 @@ def pv(request):
             passinggrades+=1
         else:
             failinggrades+=1
+    if 'email' in request.POST:
+        image = request.session['image']
+        image= base64.b64decode(image)
+        # Retrieve the HTML content from the session
+        email = EmailMessage(
+            'Subject: Message from Your Website',
+            'Here is the chart image:',
+            os.getenv('EHU'),
+            [os.getenv('EHU')],
+        )
+        email.content_subtype = "html"
+        email.attach("chartImage", image, "image/png")  # Indicate that the email content is HTML
+        email.send()
+
+        return HttpResponse('Email sent.')
 
     return render(request, 'myapp/pv.html', {'student_grades': student_grades, 'passinggrades': passinggrades, 'failinggrades': failinggrades})
 @staff_member_required
@@ -200,15 +215,16 @@ def bulletin_view(request):
             return render(request, 'myapp/bulletin.html', {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques, })   # Render the bulletin in the browser
 
         elif 'email' in request.POST:
-            image = request.session['html_content']
+            image = request.session['image']
             # Retrieve the HTML content from the session
             email = EmailMessage(
                 'Subject: Message from Your Website',
-                'This is a message from your website: ',
+                f'<img src="{image}">',
                 os.getenv('EHU'),
                 [os.getenv('EHU')],
             )
-            email.content_subtype = "html"  # Indicate that the email content is HTML
+            email.content_subtype = "html"
+            email.attach("chartImage",image,"image/png")# Indicate that the email content is HTML
             email.send()
 
             return HttpResponse('Email sent.')
@@ -232,14 +248,8 @@ def save_chart_image(request):
         if chart_image:
             # Decode Base64 to binary
             format, imgstr = chart_image.split(';base64,')
-            ext = format.split('/')[-1]  # Extract file extension (png, jpg, etc.)
-            file_name = f"chart.{ext}"
-            file_data = ContentFile(base64.b64decode(imgstr), name=file_name)
-
+            request.session['image'] = imgstr
             # Save the file (optional)
-            with open(fr"C:\Users\zareb\Bureau\myproject\myapp\media/{file_name}", "wb") as f:
-                f.write(file_data.read())
-
-            return JsonResponse({'success': True, 'file_name': file_name})
+            return JsonResponse({'success': True})
 
     return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)

@@ -57,6 +57,10 @@
       {% endfor %}
     </tbody>
   </table>
+    <form method="POST">
+    {% csrf_token %}
+    <button type="submit" name="email">Send email</button>
+    </form>
   <!-- Pie Chart Container -->
   <div id="chartContainer">
     <canvas id="passFailChart"></canvas>
