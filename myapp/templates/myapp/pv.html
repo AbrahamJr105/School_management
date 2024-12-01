@@ -4,23 +4,6 @@
   <meta charset="UTF-8">
   <title>PV</title>
   <style>
-    @media print {
-      button {
-        display: none;
-      }
-       #chartContainer {
-    display: block !important;
-    width: 50%; /* Ensure it adapts to the page width */
-    height: auto; /* Maintain aspect ratio */
-    text-align: center;
-  }
-
-  #passFailChart {
-    width: 50%; /* Scale down the chart */
-    height: auto; /* Maintain aspect ratio */ /* Ensure it doesn’t exceed typical A4 print width */
-  }
-    }
-
     /* Table Styling */
     table {
       width: 80%;
@@ -47,14 +30,8 @@
     tbody tr:hover {
       background-color: #f5f5f5;
     }
-
-    #chartContainer {
-      display: none;
-      text-align: center;
-      margin-top: 20px;
-      page-break-inside: avoid; /* Prevents the chart from splitting across pages */
-    }
   </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>User email: {{ request.session.user_email }}</h1>
@@ -80,30 +57,40 @@
       {% endfor %}
     </tbody>
   </table>
-
-  <!-- Buttons -->
-  <button onclick="handlePrint()">Print</button>
-
   <!-- Pie Chart Container -->
   <div id="chartContainer">
     <canvas id="passFailChart"></canvas>
   </div>
 
   <!-- Chart.js Library -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <script>
+        function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    </script>
+
+    <form>
+        {% csrf_token %}
+    </form>
   <script>
-    let passFailChart; // Global variable to hold the chart instance
 
-    function renderChart() {
       const ctx = document.getElementById('passFailChart').getContext('2d');
       const passCount = {{ passinggrades|default:0 }};
       const failCount = {{ failinggrades|default:0 }};
-
-      if (passFailChart) passFailChart.destroy();
-
-      // Create a new chart
-      passFailChart = new Chart(ctx, {
+      new Chart(ctx, {
         type: 'pie',
         data: {
           labels: ['Passed', 'Failed'],
@@ -121,20 +108,26 @@
           }
         }
       });
-    }
+    const canvas = document.getElementById('passFailChart');
 
-    function handlePrint() {
-      // Show chart container and render the chart
-      const chartContainer = document.getElementById('chartContainer');
-      chartContainer.style.display = 'block';
-      renderChart();
-
-      // Delay printing to ensure chart has time to render
-      setTimeout(() => {
-        window.print();
-        chartContainer.style.display = 'none'; // Hide after printing
-      }, 1000); // Adjust delay as needed
+// Convert canvas to Base64 image
+    const chartImage = canvas.toDataURL('image/png');
+    fetch('/save-chart-image/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken, // Include CSRF token for Django
+    },
+    body: JSON.stringify({ chart_image: chartImage }),
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        console.log('Chart image saved successfully!');
+    } else {
+        console.error('Error saving chart image:', data);
     }
+});
   </script>
 </body>
 </html>

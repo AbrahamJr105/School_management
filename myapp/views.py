@@ -195,14 +195,12 @@ def bulletin_view(request):
                 SommeCoiNotes=Sum(F('Module__coefficient') * F('note')),
                 moyenne=Sum(F('Module__coefficient') * F('note')) / Sum('Module__coefficient')
             )
-            html_content=render_to_string('myapp/html_content.html', {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques})
-            request.session['html_content'] = html_content
             # Render the HTML content once and store it in the session
           # Store rendered HTML in session
             return render(request, 'myapp/bulletin.html', {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques, })   # Render the bulletin in the browser
 
         elif 'email' in request.POST:
-            html_content = request.session['html_content']
+            image = request.session['html_content']
             # Retrieve the HTML content from the session
             email = EmailMessage(
                 'Subject: Message from Your Website',
@@ -216,3 +214,32 @@ def bulletin_view(request):
             return HttpResponse('Email sent.')
     else:
         return render(request, 'myapp/bulletin.html')
+
+
+import base64
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
+
+
+@csrf_exempt  # Skip CSRF for testing; use CSRF properly in production
+def save_chart_image(request):
+    if request.method == "POST":
+        import json
+        data = json.loads(request.body)
+        chart_image = data.get("chart_image")
+
+        if chart_image:
+            # Decode Base64 to binary
+            format, imgstr = chart_image.split(';base64,')
+            ext = format.split('/')[-1]  # Extract file extension (png, jpg, etc.)
+            file_name = f"chart.{ext}"
+            file_data = ContentFile(base64.b64decode(imgstr), name=file_name)
+
+            # Save the file (optional)
+            with open(fr"C:\Users\zareb\Bureau\myproject\myapp\media/{file_name}", "wb") as f:
+                f.write(file_data.read())
+
+            return JsonResponse({'success': True, 'file_name': file_name})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
