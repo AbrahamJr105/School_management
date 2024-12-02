@@ -5,24 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Charts with Chart.js</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{#    <style>#}
-{#        /* Container to hold both charts side by side */#}
-{#        .chart-container {#}
-{#            display: flex; /* Enables flexbox */#}
-{#            justify-content: space-around; /* Distributes space between the charts */#}
-{#            align-items: center; /* Aligns items vertically */#}
-{#             /* Adds space between the charts */#}
-{#        }#}
-{##}
-{#        /* Optional styling for the canvas to make it responsive */#}
-{#        canvas {#}
-{#            width: 50% !important;  /* Adjust width of the canvas elements */#}
-{#            height: auto !important; /* Maintain aspect ratio */#}
-{#        }#}
-{#    </style>#}
 </head>
 <body>
-<h1>User email: {{ request.session.user_email }}</h1>
 <div class="chart-container">
     <div>
         <h2>Bar Chart</h2>
@@ -31,14 +15,6 @@
     <div>
         <h2>Pie Chart</h2>
         <canvas id="pieChart"></canvas>
-    </div>
-    <div>
-        <h2>Bar Chart2</h2>
-        <canvas id="histogramChart2" ></canvas>
-    </div>
-    <div>
-        <h2>Pie Chart2</h2>
-        <canvas id="pieChart2"></canvas>
     </div>
 </div>
 

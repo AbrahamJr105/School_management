@@ -1,46 +1,47 @@
-<div>
-    <label>Civilité :</label>
-    <label>
-        <input type="text" value="{{ etudiant.civilite }}" readonly>
-    </label>
-</div>
-
-<div>
-    <label>Nom/Prénom :</label>
-    <label>
-        <input type="text" value="{{ etudiant.nom_pre }}" readonly>
-    </label>
-</div>
-
-<div>
-    <label>Filière :</label>
-    <label>
-        <input type="text" value="{{ etudiant.filiere }}" readonly>
-    </label>
-</div>
-
-<table>
-<thead>
-    <tr>
-        <th>ID</th>
-        <th>Filiere</th>
-        <th>Code Module</th>
-        <th>Module</th>
-        <th>Coefficient</th>
-        <th>Note</th>
-    </tr>
-</thead>
-<tbody>
-    {% for note in notes %}
-    <tr>
-        <td>{{ etudiant.id }}</td>
-        <td>{{ etudiant.filiere }}</td>
-        <td>{{ note.Module.id }}</td>
-        <td>{{ note.Module }}</td>
-        <td>{{ note.Module.coefficient }}</td>
-        <td>{{ note.note }}</td>
-    </tr>
-    {% endfor %}
-</tbody>
-</table>
-<p>{{ statistiques }}</p>
+    <style>
+    /* Table Styling */
+    table {
+      width: 80%;
+      border-collapse: collapse;
+      margin: 20px auto;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    thead {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tbody tr:nth-child(odd) {
+      background-color: #ffffff;
+    }
+    tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+  </style>
+<label>Filiere: {{ filiere.filiere_inscription }}</label>
+  <table>
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Student Name</th>
+        <th>Average Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in student_grades %}
+      <tr>
+        <td>{{ record.student.id }}</td>
+        <td>{{ record.student.nom_pre }}</td>
+        <td>{{ record.average_grade|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>

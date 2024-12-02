@@ -34,9 +34,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>User email: {{ request.session.user_email }}</h1>
+    <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="afficher">afficher</button>
+    </form>
   <!-- Display Filiere -->
-  <label>Filiere: ISIL</label>
+    {% if filiere %}
+  <label>Filiere: {{ filiere.filiere_inscription }}</label>
 
   <!-- Table of Student Grades -->
   <table>
@@ -60,6 +65,7 @@
     <form method="POST">
     {% csrf_token %}
     <button type="submit" name="email">Send email</button>
+    <button type="submit" name="emailChart">Email chart</button>
     </form>
   <!-- Pie Chart Container -->
   <div id="chartContainer">
@@ -133,5 +139,6 @@
     }
 });
   </script>
+    {% endif %}
 </body>
 </html>

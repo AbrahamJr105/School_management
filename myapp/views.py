@@ -5,8 +5,7 @@ from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from dotenv import load_dotenv
-
-from .forms import EtudiantForm, RechercheForm, loginform, EnseignantForm
+from .forms import EtudiantForm, RechercheForm, loginform, EnseignantForm, filierepv
 
 load_dotenv()
 def logout(request):
@@ -142,46 +141,65 @@ def enseignant_form(request):
         return render(request, 'myapp/enseignant_form.html', {"search_form":search_form, 'form': form})
 @staff_member_required
 def pv(request):
-    etudiants = Etudiant.objects.all()
-    student_grades = []
-    passinggrades=0
-    failinggrades=0
-    for etudiant in etudiants:
-        weighted_sum_of_notes = Note.objects.filter(Etudiant=etudiant).annotate(
-            weighted_note=F('note') * F('Module__coefficient')
-        ).aggregate(total_weighted=Sum('weighted_note'))['total_weighted'] or 0
+    if request.method == 'POST':
+        if 'afficher' in request.POST:
+            filiere=request.POST.get('filiere')
+            filiere=Filiere.objects.get(pk=filiere)
+            etudiants = Etudiant.objects.filter(filiere=filiere)
+            student_grades = []
+            passinggrades=0
+            failinggrades=0
+            for etudiant in etudiants:
+                weighted_sum_of_notes = Note.objects.filter(Etudiant=etudiant).annotate(
+                    weighted_note=F('note') * F('Module__coefficient')
+                ).aggregate(total_weighted=Sum('weighted_note'))['total_weighted'] or 0
 
-        sum_of_coefficients = Module.objects.filter(Filiere=etudiant.filiere).aggregate(
-            total_coefficient=Sum('coefficient')
-        )['total_coefficient'] or 1
+                sum_of_coefficients = Module.objects.filter(Filiere=etudiant.filiere).aggregate(
+                    total_coefficient=Sum('coefficient')
+                )['total_coefficient'] or 1
 
-        average_grade = weighted_sum_of_notes / sum_of_coefficients
+                average_grade = weighted_sum_of_notes / sum_of_coefficients
 
-        student_grades.append({
-            'student': etudiant,
-            'average_grade': average_grade
-        })
-        if average_grade >=10:
-            passinggrades+=1
-        else:
-            failinggrades+=1
-    if 'email' in request.POST:
-        image = request.session['image']
-        image= base64.b64decode(image)
-        # Retrieve the HTML content from the session
-        email = EmailMessage(
-            'Subject: Message from Your Website',
-            'Here is the chart image:',
-            os.getenv('EHU'),
-            [os.getenv('EHU')],
-        )
-        email.content_subtype = "html"
-        email.attach("chartImage", image, "image/png")  # Indicate that the email content is HTML
-        email.send()
+                student_grades.append({
+                    'student': etudiant,
+                    'average_grade': average_grade
+                })
+                if average_grade >=10:
+                    passinggrades+=1
+                else:
+                    failinggrades+=1
+            form = filierepv()
+            request.session['html_content']=render_to_string("myapp/html_content.html", {'student_grades': student_grades, 'filiere':filiere})
+            return render(request, 'myapp/pv.html',{'filiere': filiere, 'student_grades': student_grades, 'passinggrades': passinggrades,'failinggrades': failinggrades, 'form': form})
+        if 'emailChart' in request.POST:
+            image = request.session['image']
+            image= base64.b64decode(image)
+            # Retrieve the HTML content from the session
+            email = EmailMessage(
+                'Subject: Message from Your Website',
+                'Here is the chart image:',
+                os.getenv('EHU'),
+                [os.getenv('EHU')],
+            )
+            email.content_subtype = "html"
+            email.attach("chartImage", image, "image/png")  # Indicate that the email content is HTML
+            email.send()
 
-        return HttpResponse('Email sent.')
-
-    return render(request, 'myapp/pv.html', {'student_grades': student_grades, 'passinggrades': passinggrades, 'failinggrades': failinggrades})
+            return HttpResponse('Chart email sent.')
+        elif 'email' in request.POST:
+            html_content=request.session['html_content']
+            email = EmailMessage(
+                'Subject: Message from Your Website',
+                html_content,
+                os.getenv('EHU'),
+                [os.getenv('EHU')],
+            )
+            email.content_subtype = "html"
+            email.send()
+            return HttpResponse('Email sent.')
+    else:
+        form=filierepv()
+        return render(request, 'myapp/pv.html', {'form':form})
 @staff_member_required
 def statistique(request):
     all=Etudiant.objects.all().count()
@@ -190,7 +208,7 @@ def statistique(request):
     return render(request, 'myapp/statistique.html', {'male': male, 'female': female, 'all': all})
 
 
-from .models import Etudiant, Note, Module, Enseignant
+from .models import Etudiant, Note, Module, Enseignant,Filiere
 
 from django.template.loader import render_to_string
 from django.shortcuts import render, get_object_or_404
@@ -211,32 +229,29 @@ def bulletin_view(request):
                 moyenne=Sum(F('Module__coefficient') * F('note')) / Sum('Module__coefficient')
             )
             # Render the HTML content once and store it in the session
+            request.session["html_content"]= render_to_string("myapp/html_content.html", {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques, })
           # Store rendered HTML in session
             return render(request, 'myapp/bulletin.html', {'etudiant': etudiant, 'notes': notes, 'statistiques': statistiques, })   # Render the bulletin in the browser
 
         elif 'email' in request.POST:
-            image = request.session['image']
+            html_content = request.session['html_content']
             # Retrieve the HTML content from the session
             email = EmailMessage(
                 'Subject: Message from Your Website',
-                f'<img src="{image}">',
+                html_content,
                 os.getenv('EHU'),
                 [os.getenv('EHU')],
             )
             email.content_subtype = "html"
-            email.attach("chartImage",image,"image/png")# Indicate that the email content is HTML
             email.send()
 
             return HttpResponse('Email sent.')
     else:
         return render(request, 'myapp/bulletin.html')
 
-
 import base64
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core.files.base import ContentFile
-
 
 @csrf_exempt  # Skip CSRF for testing; use CSRF properly in production
 def save_chart_image(request):

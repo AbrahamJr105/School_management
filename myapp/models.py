@@ -1,7 +1,9 @@
+from contextlib import nullcontext
 
 # myapp/models.py
 from django.db import models
 class Enseignant(models.Model):
+    Email = models.EmailField(null=True)
     Numero = models.IntegerField()
     Civilite = models.CharField(max_length=20)
     Nom = models.CharField(max_length=255)
@@ -12,6 +14,9 @@ class Enseignant(models.Model):
     Pays = models.CharField(max_length=255)
     Grade = models.CharField(max_length=255)
     Specialite = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.Civilite} {self.Nom} {self.Prenom}, ID: {self.id}"
 
 class Etudiant(models.Model):
     CIVILITY_CHOICES = (
