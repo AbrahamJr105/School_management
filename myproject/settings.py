@@ -80,7 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-
+ALLOWED_HOSTS=['.vercel.app']
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -143,9 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'myapp/static'),
-)
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -155,3 +153,4 @@ EMAIL_HOST_USER = 'zarebtoufik105@gmail.com'
 EMAIL_HOST_PASSWORD =os.getenv('EHP')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'myapp/media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'myapp/static')

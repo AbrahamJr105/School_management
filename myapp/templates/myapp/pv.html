@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <title>PV</title>
   <style>
+    @media print {
+        .noprint{
+        display: none;
+        }
+    }
     /* Table Styling */
     table {
       width: 80%;
@@ -34,6 +39,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+<div>
     <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
@@ -67,8 +73,9 @@
     <button type="submit" name="email">Send email</button>
     <button type="submit" name="emailChart">Email chart</button>
     </form>
-  <!-- Pie Chart Container -->
-  <div id="chartContainer">
+        <button onclick="window.print()">Print</button>
+</div>
+  <div class="noprint" id="chartContainer">
     <canvas id="passFailChart"></canvas>
   </div>
 

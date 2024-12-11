@@ -44,8 +44,6 @@
     <table>
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Filiere</th>
             <th>Code Module</th>
             <th>Module</th>
             <th>Coefficient</th>
@@ -55,8 +53,6 @@
     <tbody>
         {% for note in notes %}
         <tr>
-            <td>{{ etudiant.id }}</td>
-            <td>{{ etudiant.filiere }}</td>
             <td>{{ note.Module.id }}</td>
             <td>{{ note.Module }}</td>
             <td>{{ note.Module.coefficient }}</td>

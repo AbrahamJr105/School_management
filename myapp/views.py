@@ -189,10 +189,10 @@ def pv(request):
         elif 'email' in request.POST:
             html_content=request.session['html_content']
             email = EmailMessage(
-                'Subject: Message from Your Website',
+                'Subject: Message from Zareb Toufik',
                 html_content,
                 os.getenv('EHU'),
-                [os.getenv('EHU')],
+                ['zarebtoufik105@gmail.com','inf3isil@gmail.com','amir.lazzaz@icloud.com',],
             )
             email.content_subtype = "html"
             email.send()
