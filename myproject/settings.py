@@ -80,7 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-ALLOWED_HOSTS = ['your-app-name.onrender.com']
+ALLOWED_HOSTS = ['myproject-x5i4.onrender.com']
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
