@@ -87,15 +87,11 @@ ALLOWED_HOSTS = ['your-app-name.onrender.com']
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mydb',
-        'USER': 'root',
-        'PASSWORD': 'P>WjB}#3K9eCR6:5bx[nZ8',
-        'HOST': 'localhost',  # Or your MySQL server's IP address
-        'PORT': '3306',
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
 
 
 
