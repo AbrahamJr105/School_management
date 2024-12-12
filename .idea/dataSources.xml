@@ -8,13 +8,6 @@
       <jdbc-url>jdbc:mysql://localhost:3306/mydb</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="db" uuid="ad51c867-abeb-4f4d-b9d8-6838be9e2b12">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\zareb\Bureau\myproject\db.sqlite3</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
     <data-source source="LOCAL" name="myprojectdb_rlmy@dpg-ctdbni3qf0us73bo7mkg-a.oregon-postgres.render.com" uuid="6ba3225b-6598-41ec-bf69-7394a7817ad4">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
