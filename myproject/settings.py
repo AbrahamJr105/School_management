@@ -86,11 +86,15 @@ ALLOWED_HOSTS = ['myproject-x5i4.onrender.com']
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'myprojectdb_rlmy',
+        'USER': 'myprojectdb_rlmy_user',
+        'PASSWORD': '0S8qPie0bN5L4TaH1Pf6vhSHkjNsDk5y',
+        'HOST': 'dpg-ctdbni3qf0us73bo7mkg-a.oregon-postgres.render.com',
+        'PORT': '5432',
     }
+}
 
 
 
