@@ -36,10 +36,10 @@ def register(request):
     else:
         form = loginform()
     return render(request, 'accounts/register.html', {'form': form})
-@staff_member_required
+@staff_member_required(login_url='/login/')
 def menu(request):
     return render(request, 'myapp/menu.html')
-@staff_member_required
+@staff_member_required(login_url='/login/')
 def etudiant_form(request):
     if request.method == 'POST':
         if 'Enregistrer' in request.POST:
@@ -139,7 +139,7 @@ def enseignant_form(request):
         form=EnseignantForm()
         search_form=RechercheForm()
         return render(request, 'myapp/enseignant_form.html', {"search_form":search_form, 'form': form})
-@staff_member_required
+@staff_member_required(login_url='/login/')
 def pv(request):
     if request.method == 'POST':
         if 'afficher' in request.POST:
@@ -200,7 +200,7 @@ def pv(request):
     else:
         form=filierepv()
         return render(request, 'myapp/pv.html', {'form':form})
-@staff_member_required
+@staff_member_required(login_url='/login/')
 def statistique(request):
     all=Etudiant.objects.all().count()
     male = Etudiant.objects.filter(civilite="Monsieur").count()
@@ -253,7 +253,6 @@ import base64
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt  # Skip CSRF for testing; use CSRF properly in production
 def save_chart_image(request):
     if request.method == "POST":
         import json

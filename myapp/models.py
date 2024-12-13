@@ -1,8 +1,7 @@
-from contextlib import nullcontext
 from django.db import models
 from django.core.exceptions import ValidationError
 class Enseignant(models.Model):
-    Email = models.EmailField(null=True)
+    email = models.EmailField(null=True)
     Numero = models.IntegerField()
     Civilite = models.CharField(max_length=20)
     Nom = models.CharField(max_length=255)
@@ -68,9 +67,9 @@ class Module(models.Model):
         return self.name
 
 class Note(models.Model):
-    Etudiant = models.ForeignKey('Etudiant', on_delete=models.SET_NULL, null=True)
-    Module = models.ForeignKey('Module', on_delete=models.SET_NULL, null=True)
-    Filiere = models.ForeignKey('Filiere', on_delete=models.SET_NULL, null=True, editable=False)
+    Etudiant = models.ForeignKey('Etudiant', on_delete=models.CASCADE, null=False)
+    Module = models.ForeignKey('Module', on_delete=models.CASCADE, null=False)
+    Filiere = models.ForeignKey('Filiere', on_delete=models.CASCADE, null=False, editable=False)
     note = models.FloatField()
 
     class Meta:
