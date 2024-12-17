@@ -17,8 +17,9 @@ def login(request):
             user = authenticate(username=request.POST['email'],password=request.POST['password'])
             if user is not None:
                 auth.login(request, user)
-                request.session['user_email'] = user.get_username()
-                return redirect('menu')
+                if user.is_staff:
+                    return redirect('menu')
+                return redirect('bulletin')
             else:
                 return HttpResponse("Wrong credentials")
     else:
@@ -30,6 +31,7 @@ def register(request):
         form = loginform(request.POST)
         if form.is_valid():
             user=User.objects.create_user(request.POST['email'],None, request.POST['password'])
+            user.is_superuser = False if request.POST['role'] == 'user' else True
             user.is_staff = False if request.POST['role'] == 'user' else True
             user.save()
             return redirect('login')
