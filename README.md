@@ -1,1 +1,1 @@
-This is a beginner school management project
+Simple school management project
