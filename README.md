@@ -1,1 +1,3 @@
-Simple school management project
+Simple CRUD school management project
+
+I intentionally didn't implement any security measures.
