@@ -1,25 +1,40 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Menu</title>
-    <style>
-        a{
-            text-decoration: none;
-            color: black;
-        }
-    </style>
-</head>
-<body>
-<button type="submit" ><a href="etudiant">Etudiant</a></button>
-<button type="submit" ><a href="enseignant">Enseignant</a></button>
-<button type="submit" ><a href="admin">Tableux</a></button>
-<button type="submit" ><a href="bulletin">Bulletin</a> </button>
-<button type="submit" ><a href="statistique" >Statistique</a></button>
-<button type="submit" ><a href="pv">PV</a></button>
-<br>
-<a href="logout">Log out</a>
-</script>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Tableau de Bord - École Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-tachometer-alt"></i> Tableau de Bord</h2>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Bienvenue dans le système de gestion scolaire. Sélectionnez une option ci-dessous :</p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <a href="/admin/" class="menu-item">
+        <i class="fas fa-cogs"></i>
+        <h3>Administration</h3>
+        <p>Gérer les étudiants, enseignants et toutes les données via l'interface d'administration Django</p>
+    </a>
+    
+    <a href="{% url 'bulletin' %}" class="menu-item">
+        <i class="fas fa-clipboard-list"></i>
+        <h3>Bulletins de Notes</h3>
+        <p>Consulter et imprimer les bulletins des étudiants</p>
+    </a>
+    
+    <a href="{% url 'statistique' %}" class="menu-item">
+        <i class="fas fa-chart-bar"></i>
+        <h3>Statistiques</h3>
+        <p>Visualiser les données et statistiques de l'école</p>
+    </a>
+    
+    <a href="{% url 'pv' %}" class="menu-item">
+        <i class="fas fa-file-alt"></i>
+        <h3>Procès-Verbaux</h3>
+        <p>Générer et consulter les PV par filière</p>
+    </a>
+</div>
+{% endblock %}

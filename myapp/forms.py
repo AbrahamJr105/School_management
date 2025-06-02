@@ -1,65 +1,39 @@
 # myapp/forms.py
 from django import forms
 from django.contrib.auth.models import User
-from .models import Etudiant, Sport, Enseignant,Filiere
+from .models import Filiere
+
 
 class filierepv(forms.Form):
-    filiere = forms.ModelChoiceField(queryset=Filiere.objects.all(), empty_label="Select Filiere")
+    """Form for selecting a field of study for PV generation."""
+    filiere = forms.ModelChoiceField(
+        queryset=Filiere.objects.all(), 
+        empty_label="Sélectionner une filière",
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'required': True
+        })
+    )
+
 
 class loginform(forms.ModelForm):
+    """Form for user authentication."""
+    
     class Meta:
-        model=User
-        fields = ('email','password')
-
-class EnseignantForm(forms.ModelForm):
-    class Meta:
-        model=Enseignant
-        fields='__all__'
+        model = User
+        fields = ('email', 'password')
         widgets = {
-            'Civilite': forms.Select(choices=[
-                ('Monsieur','Monsieur'),
-                ('Madame','Madame'),
-                ('Mademoiselle','Mademoiselle'),
-            ]),
-            'Date_naissance': forms.SelectDateWidget(years=range(1924,2024)),
-            'Grade': forms.Select(choices=[
-                ('Assistant','Assistant'),
-                ('MAB','MAB'),
-                ('MAA','MAA'),
-                ('MCB','MCB') ,
-                ('MCA','MCA'),
-                ('Professeur','Professeur')
-            ,]),
-            'Specialite': forms.Select(choices=[
-                ('Informatique','Informatique'),
-                ('Mathématiques','Mathématiques'),
-                ('Anglais','Anglais'),
-                ('autres','autres'),
-            ]),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Entrez votre email',
+                'required': True
+            }),
+            'password': forms.PasswordInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Entrez votre mot de passe',
+                'required': True
+            })
         }
 
-class EtudiantForm(forms.ModelForm):
-    class Meta:
-        model = Etudiant
-        fields = '__all__'
-        widgets = {
-            'plat_form': forms.CheckboxSelectMultiple(choices=[
-                ("Windows", "Windows"),
-                ("Linux", "Linux"),
-                ("Mac", "Mac"),
-            ]),
-            'date_naissance': forms.SelectDateWidget(years=range(1924,2024)),
-            'applications': forms.SelectMultiple(choices=[
-                ("SGBD", "SGBD"),
-                ("Bureautique", "Bureautique"),
-                ("DAO", "DAO"),
-                ("Statistique", "Statistique"),
-                ("Internet", "Internet"),
-            ]),
-        }
-    sports = forms.ModelMultipleChoiceField(
-        queryset=Sport.objects.all(),
-        widget=forms.CheckboxSelectMultiple)
 
-class RechercheForm(forms.Form):
-    numero = forms.IntegerField(label="Numero")
+

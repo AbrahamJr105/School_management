@@ -1,7 +1,65 @@
-<h2>Login</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" name="login">Login</button>
-    <a href="/register/" onclick="redirectToRoot()">Register</a>
-</form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - École Management</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-title">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Connexion</h2>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" 
+                           name="email" 
+                           id="email" 
+                           class="form-control" 
+                           placeholder="Entrez votre email"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Mot de passe
+                    </label>
+                    <input type="password" 
+                           name="password" 
+                           id="password" 
+                           class="form-control" 
+                           placeholder="Entrez votre mot de passe"
+                           required>
+                </div>
+                
+                <button type="submit" name="login" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Se connecter
+                </button>
+                
+                <a href="{% url 'register' %}" class="auth-link">
+                    <i class="fas fa-user-plus"></i> Créer un compte
+                </a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

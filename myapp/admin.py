@@ -15,8 +15,8 @@ admin.site.site_header= 'Admin Panel'
 admin.site.site_title= 'Admin Panel'
 
 class NoteAdmin(admin.ModelAdmin):
-    list_display = ('Etudiant', 'Module', 'Filiere', 'note')
-    search_fields = ('Etudiant__nom_pre', 'Module__name', 'Filiere__filiere_inscription')
-    list_filter = ('Filiere', 'Module')
+    list_display = ('etudiant', 'module', 'filiere', 'note')
+    search_fields = ('etudiant__nom_pre', 'module__name', 'filiere__filiere_inscription')
+    list_filter = ('filiere', 'module')
 
 admin.site.register(Note, NoteAdmin)

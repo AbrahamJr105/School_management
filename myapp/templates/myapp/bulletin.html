@@ -1,80 +1,136 @@
-<!DOCTYPE html>
-<html lang="fr">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Bulletin de Notes</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 50%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-    </style>
-</head>
+{% block title %}Bulletin de Notes - École Management{% endblock %}
 
-<body>
-    <h2>Bulletin de Notes</h2>
-    {% if etudiant %}
-    <div>
-            <p>Civilité: {{ etudiant.civilite }}</p>
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-clipboard-list"></i> Bulletin de Notes</h2>
     </div>
+    <div class="card-body">
+        {% if etudiant %}
+            <!-- Student Information -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <strong><i class="fas fa-user"></i> Étudiant:</strong>
+                            <p class="text-primary">{{ etudiant.civilite }} {{ etudiant.nom_pre }}</p>
+                        </div>
+                        <div class="form-group">
+                            <strong><i class="fas fa-graduation-cap"></i> Filière:</strong>
+                            <p class="text-primary">{{ etudiant.filiere }}</p>
+                        </div>
+                        <div class="form-group">
+                            <strong><i class="fas fa-id-card"></i> ID Étudiant:</strong>
+                            <p class="text-primary">#{{ etudiant.id }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div>
+            <!-- Grades Table -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> Code Module</th>
+                            <th><i class="fas fa-book"></i> Module</th>
+                            <th><i class="fas fa-weight-hanging"></i> Coefficient</th>
+                            <th><i class="fas fa-star"></i> Note</th>
+                            <th><i class="fas fa-check-circle"></i> Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>                        {% for note in notes %}
+                        <tr>
+                            <td>{{ note.module.id }}</td>
+                            <td>{{ note.module.name }}</td>
+                            <td>{{ note.module.coefficient }}</td>
+                            <td class="grade-cell">
+                                <span class="{% if note.note >= 10 %}grade-pass{% else %}grade-fail{% endif %}">
+                                    {{ note.note }}/20
+                                </span>
+                            </td>
+                            <td>
+                                {% if note.note >= 10 %}
+                                    <span class="text-success"><i class="fas fa-check"></i> Admis</span>
+                                {% else %}
+                                    <span class="text-danger"><i class="fas fa-times"></i> Ajourné</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-            <p>Nom/Prénom:{{ etudiant.nom_pre }}</p>
+            <!-- Statistics -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ statistiques.moyenne|floatformat:2 }}</div>
+                            <div class="stat-label">Moyenne Générale</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ statistiques.SommeCoefficient }}</div>
+                            <div class="stat-label">Total Coefficients</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number {% if statistiques.moyenne >= 10 %}text-success{% else %}text-danger{% endif %}">
+                                {% if statistiques.moyenne >= 10 %}
+                                    <i class="fas fa-check-circle"></i> Admis
+                                {% else %}
+                                    <i class="fas fa-times-circle"></i> Ajourné
+                                {% endif %}
+                            </div>
+                            <div class="stat-label">Résultat Final</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Actions -->
+            <div class="btn-group mt-4">
+                <button onclick="window.print()" class="btn btn-secondary btn-print">
+                    <i class="fas fa-print"></i> Imprimer
+                </button>
+                <form method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="email" class="btn btn-info">
+                        <i class="fas fa-envelope"></i> Envoyer par Email
+                    </button>
+                </form>
+            </div>
+        {% endif %}
     </div>
+</div>
 
-    <div>
-
-            <p>Filière: {{ etudiant.filiere }} </p>
-
+<!-- Search Form -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-search"></i> Rechercher un Étudiant</h3>
     </div>
-
-    <table>
-    <thead>
-        <tr>
-            <th>Code Module</th>
-            <th>Module</th>
-            <th>Coefficient</th>
-            <th>Note</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for note in notes %}
-        <tr>
-            <td>{{ note.Module.id }}</td>
-            <td>{{ note.Module }}</td>
-            <td>{{ note.Module.coefficient }}</td>
-            <td>{{ note.note }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-    </table>
-    <p>{{ statistiques }}</p>
-        <button onclick=print()>Print</button>
+    <div class="card-body">
         <form method="POST">
-        {% csrf_token %}
-        <button type="submit" name="email">Send Email</button>
-    </form>
-    {% endif %}
-    <h2>Rechercher un étudiant</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <label for="num">Numéro Étudiant :</label>
-        <input type="number" name="num" id="num" required>
-        <button type="submit" name="bulletin">Voir le Bulletin</button>
-    </form>
-<a href="/logout/">Log out</a>
-</body>
-</html>
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label for="num" class="form-label">Numéro Étudiant</label>
+                    <input type="number" 
+                           name="num" 
+                           id="num" 
+                           class="form-control" 
+                           placeholder="Entrez le numéro de l'étudiant"
+                           required>
+                </div>
+                <div class="form-group" style="align-self: end;">
+                    <button type="submit" name="bulletin" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,47 +1,283 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Transcript - {{ filiere.filiere_inscription }}</title>
     <style>
-    /* Table Styling */
-    table {
-      width: 80%;
-      border-collapse: collapse;
-      margin: 20px auto;
-      border-radius: 5px;
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    thead {
-      background-color: #4CAF50;
-      color: white;
-    }
-    tbody tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    tbody tr:nth-child(odd) {
-      background-color: #ffffff;
-    }
-    tbody tr:hover {
-      background-color: #f5f5f5;
-    }
-  </style>
-<label>Filiere: {{ filiere.filiere_inscription }}</label>
-  <table>
-    <thead>
-      <tr>
-        <th>Student ID</th>
-        <th>Student Name</th>
-        <th>Average Grade</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for record in student_grades %}
-      <tr>
-        <td>{{ record.student.id }}</td>
-        <td>{{ record.student.nom_pre }}</td>
-        <td>{{ record.average_grade|floatformat:2 }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .email-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #1e40af;
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #64748b;
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+        }
+        
+        .program-info {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .program-info h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .grades-table th {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .grades-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.95rem;
+        }
+        
+        .grades-table tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        .grades-table tbody tr:hover {
+            background-color: #e0f2fe;
+            transition: background-color 0.2s ease;
+        }
+        
+        .grade-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .grade-pass {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .grade-fail {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .summary {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .summary h3 {
+            margin: 0 0 15px 0;
+            color: #1e40af;
+            font-size: 1.2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e40af;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .timestamp {
+            background: #e0f2fe;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #0369a1;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .grades-table th,
+            .grades-table td {
+                padding: 8px;
+                font-size: 0.85rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Academic Transcript</h1>
+            <p>Official Grade Report</p>
+        </div>
+        
+        <div class="timestamp">
+            Generated on: {% now "F d, Y \a\t g:i A" %}
+        </div>
+        
+        <div class="program-info">
+            <h2>{{ filiere.filiere_inscription }}</h2>
+            <p>Academic Program</p>
+        </div>
+        
+        <table class="grades-table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Average Grade</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in student_grades %}
+                <tr>
+                    <td><strong>{{ record.student.id }}</strong></td>
+                    <td>{{ record.student.nom_pre }}</td>
+                    <td><strong>{{ record.average_grade|floatformat:2 }}/20</strong></td>
+                    <td>
+                        {% if record.average_grade >= 10 %}
+                            <span class="grade-status grade-pass">Pass</span>
+                        {% else %}
+                            <span class="grade-status grade-fail">Fail</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 30px; color: #64748b;">
+                        No grade records found for this program.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if student_grades %}
+        <div class="summary">
+            <h3>Program Summary</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">{{ student_grades|length }}</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">
+                        {% with passing=student_grades|length %}
+                            {% for record in student_grades %}
+                                {% if record.average_grade >= 10 %}{{ forloop.counter0|add:1 }}{% endif %}
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                    <div class="stat-label">Passing</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">
+                        {% with student_grades as grades %}
+                            {% if grades %}
+                                {{ grades|length|add:-1 }}
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="footer">
+            <p>This is an automatically generated academic transcript.</p>
+            <p>© {% now "Y" %} School Management System. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

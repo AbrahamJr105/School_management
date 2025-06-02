@@ -12,27 +12,22 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
 load_dotenv()
-
-# settings.py
- # Redirect after logout
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!i8pmy08lvr_)u^h#+@&n4t*+0myn8)3x&2a_h#_#@%v9$1^sx'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!i8pmy08lvr_)u^h#+@&n4t*+0myn8)3x&2a_h#_#@%v9$1^sx')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-
-SECRET_KEY = os.getenv('SECRET_KEY','default-dev-secret')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,20 +41,20 @@ INSTALLED_APPS = [
     "debug_toolbar",
 ]
 
-MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+MIDDLEWARE = [    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    "django.contrib.auth.middleware.LoginRequiredMiddleware",
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    ]
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
 
-LOGIN_URL= '/login/'
+# Login settings
+LOGIN_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/login/'
 ROOT_URLCONF = 'myproject.urls'
 
 TEMPLATES = [
@@ -80,19 +75,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-ALLOWED_HOSTS = ['*']
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'myprojectdb_rlmy',
-        'USER': 'myprojectdb_rlmy_user',
-        'PASSWORD': '0S8qPie0bN5L4TaH1Pf6vhSHkjNsDk5y',
-        'HOST': 'dpg-ctdbni3qf0us73bo7mkg-a.oregon-postgres.render.com',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -146,12 +135,23 @@ MEDIA_URL = '/media/'
 
 
 
+# Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'zarebtoufik105@gmail.com'
-EMAIL_HOST_PASSWORD =os.getenv('EHP')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'zarebtoufik105@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'myapp/media')
-STATIC_ROOT = os.path.join(BASE_DIR, 'myapp/static')
+# Media and Static files configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'myapp', 'static'),
+]
+
+# WhiteNoise configuration for static files in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

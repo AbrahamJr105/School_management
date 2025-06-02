@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}École Management System{% endblock %}</title>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js for statistics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="{% url 'menu' %}" class="navbar-brand">
+                    <i class="fas fa-graduation-cap"></i>
+                    École Management
+                </a>
+                
+                {% if user.is_authenticated %}                <ul class="navbar-nav">
+                    {% if user.is_staff %}
+                        <li><a href="{% url 'menu' %}" class="nav-link"><i class="fas fa-home"></i> Accueil</a></li>
+                        <li><a href="/admin/myapp/etudiant/" class="nav-link"><i class="fas fa-user-graduate"></i> Étudiants</a></li>
+                        <li><a href="/admin/myapp/enseignant/" class="nav-link"><i class="fas fa-chalkboard-teacher"></i> Enseignants</a></li>
+                        <li><a href="/admin/" class="nav-link"><i class="fas fa-cogs"></i> Administration</a></li>
+                        <li><a href="{% url 'statistique' %}" class="nav-link"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                        <li><a href="{% url 'pv' %}" class="nav-link"><i class="fas fa-file-alt"></i> PV</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'bulletin' %}" class="nav-link"><i class="fas fa-clipboard-list"></i> Bulletin</a></li>
+                    <li><a href="{% url 'logout' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+                </ul>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 École Management System. Développé par Zareb Toufik.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

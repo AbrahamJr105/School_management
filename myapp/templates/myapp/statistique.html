@@ -1,33 +1,327 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charts with Chart.js</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-<div class="chart-container">
-    <div>
-        <h2>Bar Chart</h2>
-        <canvas id="histogramChart" ></canvas>
-    </div>
-    <div>
-        <h2>Pie Chart</h2>
-        <canvas id="pieChart"></canvas>
+{% extends "base.html" %}
+{% load static %}
+{% load math_extras %}
+
+{% block title %}Statistics Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <div class="header-content">
+            <i class="fas fa-chart-bar header-icon"></i>
+            <div>
+                <h1>Statistics Dashboard</h1>
+                <p>Comprehensive analytics and insights for student demographics</p>
+            </div>
+        </div>
     </div>
 </div>
 
+<div class="container">
+    <!-- Statistics Summary Cards -->
+    <div class="stats-grid">
+        <div class="stat-card total-students">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Total Students</h3>
+                <div class="stat-number">{{ all }}</div>
+                <p>Enrolled students</p>
+            </div>
+        </div>
+
+        <div class="stat-card male-students">
+            <div class="stat-icon">
+                <i class="fas fa-male"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Male Students</h3>
+                <div class="stat-number">{{ male }}</div>
+                <p>{{ male|floatformat:0 }} students ({{ male|mul:100|div:all|floatformat:1 }}%)</p>
+            </div>
+        </div>
+
+        <div class="stat-card female-students">
+            <div class="stat-icon">
+                <i class="fas fa-female"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Female Students</h3>
+                <div class="stat-number">{{ female }}</div>
+                <p>{{ female|floatformat:0 }} students ({{ female|mul:100|div:all|floatformat:1 }}%)</p>
+            </div>
+        </div>
+
+        <div class="stat-card gender-ratio">
+            <div class="stat-icon">
+                <i class="fas fa-balance-scale"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Gender Ratio</h3>
+                <div class="stat-number">{{ male|floatformat:0 }}:{{ female|floatformat:0 }}</div>
+                <p>Male to Female ratio</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i>
+                <h3>Gender Distribution - Bar Chart</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="histogramChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i>
+                <h3>Gender Distribution - Pie Chart</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Insights -->
+    <div class="insights-section">
+        <div class="card insights-card">
+            <div class="card-header">
+                <i class="fas fa-lightbulb"></i>
+                <h3>Key Insights</h3>
+            </div>
+            <div class="card-body">
+                <div class="insights-grid">
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <i class="fas fa-trending-up"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Enrollment Status</h4>
+                            <p>Currently tracking {{ all }} students across all programs</p>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Gender Balance</h4>
+                            <p>
+                                {% if male > female %}
+                                    More male students ({{ male|mul:100|div:all|floatformat:1 }}% vs {{ female|mul:100|div:all|floatformat:1 }}%)
+                                {% elif female > male %}
+                                    More female students ({{ female|mul:100|div:all|floatformat:1 }}% vs {{ male|mul:100|div:all|floatformat:1 }}%)
+                                {% else %}
+                                    Perfect gender balance (50% each)
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-item">
+                        <div class="insight-icon">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Diversity Index</h4>
+                            <p>Gender diversity score: {{ male|mul:female|mul:4|div:all|div:all|mul:100|floatformat:1 }}%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.total-students .stat-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.male-students .stat-icon {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.female-students .stat-icon {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.gender-ratio .stat-icon {
+    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0.5rem 0;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-info p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.chart-container {
+    padding: 1rem;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.insights-section {
+    margin-top: 2rem;
+}
+
+.insights-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.insight-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-light);
+    border-radius: 8px;
+}
+
+.insight-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.insight-content h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-dark);
+    font-size: 1.1rem;
+}
+
+.insight-content p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Bar Chart
     const ctxBar = document.getElementById("histogramChart").getContext("2d");
-
+    
     const dataBar = {
         labels: ["Male", "Female"],
         datasets: [{
-            label: "Gender Distribution",
-            data: [{{ male }}, {{ female }}],
-            backgroundColor: ["blue", "pink"]
+            label: "Number of Students",
+            data: [parseInt('{{ male }}'), parseInt('{{ female }}')],
+            backgroundColor: [
+                'rgba(79, 172, 254, 0.8)',
+                'rgba(240, 147, 251, 0.8)'
+            ],
+            borderColor: [
+                'rgba(79, 172, 254, 1)',
+                'rgba(240, 147, 251, 1)'
+            ],
+            borderWidth: 2,
+            borderRadius: 8
         }]
     };
 
@@ -35,11 +329,37 @@
         type: "bar",
         data: dataBar,
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1,
+                        color: '#666'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#666'
+                    },
+                    grid: {
+                        display: false
                     }
                 }
             }
@@ -48,13 +368,21 @@
 
     // Pie Chart
     const ctxPie = document.getElementById("pieChart").getContext("2d");
-
+    
     const dataPie = {
         labels: ["Male", "Female"],
         datasets: [{
-            label: "Gender (%)",
-            data: [({{ male }}/{{ all }})*100, ({{ female }}/ {{all}})*100],
-            backgroundColor: ["blue", "pink"]
+            label: "Gender Distribution (%)",
+            data: [parseFloat('{{ male }}') / parseFloat('{{ all }}') * 100, parseFloat('{{ female }}') / parseFloat('{{ all }}') * 100],
+            backgroundColor: [
+                'rgba(79, 172, 254, 0.8)',
+                'rgba(240, 147, 251, 0.8)'
+            ],
+            borderColor: [
+                'rgba(79, 172, 254, 1)',
+                'rgba(240, 147, 251, 1)'
+            ],
+            borderWidth: 2
         }]
     };
 
@@ -63,14 +391,31 @@
         data: dataPie,
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'top',
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        color: '#666'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed.toFixed(1) + '%';
+                        }
+                    }
                 }
             }
         }
     });
+});
 </script>
-
-</body>
-</html>
+{% endblock %}
